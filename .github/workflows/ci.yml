@@ -1,7 +1,7 @@
 name: ci
 on:
   push:
-    branches: [master]
+    branches: [master,unitTestsInvestigation2]
   pull_request:
     branches: [master]
 jobs:
@@ -30,7 +30,7 @@ jobs:
         working-directory: ./assistive-webdriver
       - run: yarn format:check
         working-directory: ./assistive-webdriver
-      - run: yarn test --coverage
+      - run: NUM=0; while yarn test --coverage ; do NUM=$((NUM+1)); echo "$NUM time(s) successful"; done
         working-directory: ./assistive-webdriver
       - uses: codecov/codecov-action@v1
         with:
