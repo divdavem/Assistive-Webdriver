@@ -49,6 +49,10 @@ describe("server", () => {
     getScreenReaderClients
   } = useScreenReaderMock();
 
+  afterAll(() => {
+    console.log("INFO (afterAll) = ", (global as any).info);
+  });
+
   it("should raise an error when there is no matching VM configuration", async () => {
     const webdriver = new Builder()
       .usingServer(getUrl())

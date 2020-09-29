@@ -97,9 +97,20 @@ class PointerInputSource extends NullInputSource {
       x: Math.round(originPosition.x + action.x),
       y: Math.round(originPosition.y + action.y)
     };
+    const info: any[] = [
+      {
+        fromX: from.x,
+        fromY: from.y,
+        toX: to.x,
+        toY: to.y,
+        duration
+      }
+    ];
+    (global as any).info = info;
     let currentTime = Date.now();
     const endTime = currentTime + duration;
     let remainingTime = endTime - currentTime;
+    info.push({ pos: 1, currentTime, endTime, remainingTime });
     while (remainingTime > 0) {
       const howCloseToEnd = remainingTime / duration;
       mousePosition.x = Math.round(
@@ -108,21 +119,27 @@ class PointerInputSource extends NullInputSource {
       mousePosition.y = Math.round(
         howCloseToEnd * from.y + (1 - howCloseToEnd) * to.y
       );
+      info.push({ pos: 2, x: mousePosition.x, y: mousePosition.y });
       await this.vm.sendMouseMoveEvent({
         ...to,
         ...mousePosition
       });
       currentTime = Date.now();
       remainingTime = endTime - currentTime;
+      info.push({ pos: 3, currentTime, endTime, remainingTime });
       if (remainingTime > 0) {
         await wait(Math.min(remainingTime, 50));
         currentTime = Date.now();
         remainingTime = endTime - currentTime;
+        info.push({ pos: 4, currentTime, endTime, remainingTime });
       }
     }
     mousePosition.x = to.x;
     mousePosition.y = to.y;
+    info.push({ pos: 5, x: to.x, y: to.y });
     await this.vm.sendMouseMoveEvent(to);
+    console.log("INFO (normal) = ", (global as any).info);
+    (global as any).info = null;
   }
 
   async execute_pointerDown(action: any) {
